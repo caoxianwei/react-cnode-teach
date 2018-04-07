@@ -19,7 +19,7 @@ module.exports = {
     // 如果是''，引用路径是:app.hash.js
     // 如果是'/public'，引用路径是/public/app.hash.js
     // 这个东西非常有用，可以帮我们去区分某个url是静态资源，还是api的请求，或者是某些需要特殊处理的请求
-    publicPath: ''
+    publicPath: '/public'
   },
   module: {
     rules: [
@@ -37,6 +37,8 @@ module.exports = {
     ]
   },
   plugins: [
-    new HTMLPlugin()
+    new HTMLPlugin({
+      template: path.join(__dirname, '../client/template.html')
+    })
   ]
 }

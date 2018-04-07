@@ -5,4 +5,4 @@ import App from './App.jsx';
 
 // 先渲染挂载在body上面，因为还没写模板呢
 // 推荐是不能这么挂载的
-ReactDOM.render(<App />, document.body);
+ReactDOM.hydrate(<App />, document.getElementById('root'));

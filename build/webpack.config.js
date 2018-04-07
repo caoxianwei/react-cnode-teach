@@ -1,5 +1,6 @@
 // 利用path这个包，来完成绝对路径的书写，因为用相对路径的话，可能会出现系统之间的差异等问题
 const path = require('path');
+const HTMLPlugin = require('html-webpack-plugin');
 module.exports = {
   // 应用的入口
   entry: {
@@ -18,7 +19,24 @@ module.exports = {
     // 如果是''，引用路径是:app.hash.js
     // 如果是'/public'，引用路径是/public/app.hash.js
     // 这个东西非常有用，可以帮我们去区分某个url是静态资源，还是api的请求，或者是某些需要特殊处理的请求
-    publicPath: '/public'
-
-  }
+    publicPath: ''
+  },
+  module: {
+    rules: [
+      {
+        test: /.jsx$/,
+        loader: 'babel-loader'
+      },
+      {
+        test: /.js$/,
+        loader: 'babel-loader',
+        exclude: [
+          path.join(__dirname, '../node_modules')
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new HTMLPlugin()
+  ]
 }

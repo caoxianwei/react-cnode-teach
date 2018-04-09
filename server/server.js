@@ -21,7 +21,7 @@ app.get('*', function (req, res) {
   // 服务端渲染
   const appString = ReactSSR.renderToString(serverEntry);
   // 替换，然后返回浏览器
-  res.send(template.replace('<app></app>', appString));
+  res.send(template.replace('<!--app-->', appString));
 });
 
 // 监听端口

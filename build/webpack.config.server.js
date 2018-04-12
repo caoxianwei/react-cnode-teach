@@ -8,7 +8,7 @@ module.exports = {
   output: {
     filename: 'server-entry.js',
     path: path.join(__dirname, '../dist'),
-    publicPath: '/public',
+    publicPath: '/public/',
     // 打包出来的js，所使用的模块加载方案，可以是：umd cmd amd commonjs
     libraryTarget: 'commonjs2'
   },

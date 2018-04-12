@@ -1,6 +1,7 @@
 // 利用path这个包，来完成绝对路径的书写，因为用相对路径的话，可能会出现系统之间的差异等问题
 const path = require('path');
 const HTMLPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 // 判断环境是不是开发环境
 const isDev = process.env.NODE_ENV === 'development';
 const config = {
@@ -21,7 +22,7 @@ const config = {
 		// 如果是''，引用路径是:app.hash.js
 		// 如果是'/public'，引用路径是/public/app.hash.js
 		// 这个东西非常有用，可以帮我们去区分某个url是静态资源，还是api的请求，或者是某些需要特殊处理的请求
-		publicPath: '/public'
+		publicPath: '/public/'
 	},
 	module: {
 		rules: [
@@ -46,19 +47,27 @@ const config = {
 }
 
 if (isDev) {
+	config.entry = {
+		app: [
+			'react-hot-loader/patch',
+			path.join(__dirname, '../client/app.js')
+		]
+	}
 	config.devServer = {
 		host: '0.0.0.0',
 		port: '8888',
 		contentBase: path.join(__dirname, '../dist'),
-		// hot: true,
+		hot: true,
 		overlay: {
 			errors: true
 		},
-		publicPath: '/public',
+		publicPath: '/public/',
 		historyApiFallback: {
 			index: '/public/index.html'
 		}
 	};
+
+	config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
 module.exports = config;

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-export default class App extends Component {
-  constructor() {
-    super();
-  }
 
+export default class App extends Component {
+  componentDidMount() {
+    // do something
+  }
   render() {
     return (
-      <div>This is App</div>
+      <div>This is App1</div>
     );
   }
 }

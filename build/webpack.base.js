@@ -1,5 +1,8 @@
 const path = require('path');
 module.exports = {
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
   output: {
     // 打包输出文件的存放地址
     path: path.join(__dirname, '../dist'),

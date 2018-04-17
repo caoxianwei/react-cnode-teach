@@ -1,5 +1,6 @@
 const path = require('path');
 module.exports = {
+  // 忽略后缀名
   resolve: {
     extensions: ['.js', '.jsx'],
   },

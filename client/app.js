@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'mobx-react';
 import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
-// 这个jsx的后缀名现在还需要写，因为, 此时的webpack还没配置忽略后缀名的方法
 import App from './views/App';
+import appState from './store/app-state';
+
 
 // 先渲染挂载在body上面，因为还没写模板呢
 // 推荐是不能这么挂载的
@@ -13,7 +16,11 @@ const root = document.getElementById('root');
 const render = (Component) => {
   ReactDOM.hydrate(
     <AppContainer>
-      <Component />
+      <BrowserRouter>
+        <Provider appState={appState}>
+          <Component />
+        </Provider>
+      </BrowserRouter>
     </AppContainer>,
     root,
   );

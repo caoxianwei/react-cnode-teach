@@ -30,7 +30,7 @@ router.post('/login', function (req, res, next) {
         // 接口报错，业务逻辑错误，非服务器报错
         res.json({
           success: false,
-          data: err.response
+          data: err.response.data
         })
       } else {
         // 将错误，抛给全局的错误处理器

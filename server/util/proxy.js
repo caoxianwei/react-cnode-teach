@@ -1,6 +1,8 @@
 // 这个js里面，将所有的发到cnode的接口，全部代理出去
 const axios = require('axios');
 
+const queryString = require('query-string');
+
 // cnode网站，公用的URL片段
 const baseUrl = 'http://cnodejs.org/api/v1';
 
@@ -13,7 +15,7 @@ module.exports = function (req, res, next) {
   // 放在req.query上面
   const needAccessToken = req.query.needAccessToken;
   // 如果这个接口需要accesstoken，但是session里面没有
-  if (needAccessToken && user.accessToken) {
+  if (needAccessToken && !user.accessToken) {
     // 接口401
     res.status(401).send({
       success: false,
@@ -31,13 +33,15 @@ module.exports = function (req, res, next) {
   axios(`${baseUrl}${path}`, {
     method: req.method,
     params: query,
-    data: Object.assign({}, req.body, {
+    // 如果没用queryString.stringify的话，===> {'accesstoken':'xxxx'}
+    // 如果用queryString.stringify的话，=====> accesstoken=xxxx---就跟用formData也就是form表单请求，那样的格式
+    data: queryString.stringify(Object.assign({}, req.body, {
       accesstoken: user.accessToken
-    }),
+    })),
     // axios发送的时候，默认是application/json
     // 因为cnode API所有的接口，都可以接受application/x-www-form-urlencode格式的数据，也就是formData格式的数据
     headers: {
-      'Content-Type': 'application/x-www-form-urlencode'
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
   })
     .then(resp => {

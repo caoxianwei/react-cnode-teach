@@ -1,5 +1,7 @@
 const express = require('express');
 const favicon = require('serve-favicon');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 // react服务端渲染的主要模块
 const ReactSSR = require('react-dom/server');
 // fs模块
@@ -12,7 +14,28 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const app = express();
 
+// 将application的json的格式的数据，转化为req.body上面的数据
+app.use(bodyParser.json());
+// 将application的formData的格式的数据，转化为req.body上面的数据
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// 真正上线的话，session是要存在数据库中的，作为缓存或者ruandeisi
+// 现在的话，放到node端，也就是启动之后，直接放在内存中，跟着我们的服务一起启动
+// node服务一旦出现问题，就需要重新登录
+// 服务启动，给session设置值
+app.use(session({
+  maxAge: 10 * 60 * 1000, // 10分钟
+  name: 'tid',// cookie ID的名字
+  resave: false,// 每次请求，是否需要重新生成一个cookie id，一般不需要，太浪费资源
+  saveUninitialized: false, // 同上个
+  secret: 'react cnode class'// 用一个字符串去加密我们的cookie
+}))
+
 app.use(favicon(path.join(__dirname, '../favicon.ico')));
+
+// 一定要放在服务端渲染的代码的前面
+app.use('/api/user', require('./util/handle-login'));
+app.use('/api', require('./util/proxy'));
 
 if (!isDev) {
   // 不是开发环境的时候，这么做

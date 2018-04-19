@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
 import App from './views/App';
-import appState from './store/app-state';
+import AppState from './store/app-state';
 
 
 // 先渲染挂载在body上面，因为还没写模板呢
@@ -17,7 +17,7 @@ const render = (Component) => {
   ReactDOM.hydrate(
     <AppContainer>
       <BrowserRouter>
-        <Provider appState={appState}>
+        <Provider appState={new AppState()}>
           <Component />
         </Provider>
       </BrowserRouter>

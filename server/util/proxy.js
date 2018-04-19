@@ -23,7 +23,9 @@ module.exports = function (req, res, next) {
     })
   }
 
-  const query = Object.assign({}, req.query);
+  const query = Object.assign({}, req.query, {
+    accesstoken: (needAccessToken && req.method === 'GET') ? user.accessToken : ''
+  });
 
   if (query.needAccessToken) {
     delete query.needAccessToken;
@@ -36,7 +38,7 @@ module.exports = function (req, res, next) {
     // 如果没用queryString.stringify的话，===> {'accesstoken':'xxxx'}
     // 如果用queryString.stringify的话，=====> accesstoken=xxxx---就跟用formData也就是form表单请求，那样的格式
     data: queryString.stringify(Object.assign({}, req.body, {
-      accesstoken: user.accessToken
+      accesstoken: (needAccessToken && req.method === 'POST') ? user.accessToken : ''
     })),
     // axios发送的时候，默认是application/json
     // 因为cnode API所有的接口，都可以接受application/x-www-form-urlencode格式的数据，也就是formData格式的数据

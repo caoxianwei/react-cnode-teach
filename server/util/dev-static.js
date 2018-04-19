@@ -14,6 +14,12 @@ const MemoryFs = require('memory-fs');
 // 引入http-proxy-middleware
 const proxy = require('http-proxy-middleware');
 
+// 序列化
+const serialize = require('serialize-javascript');
+
+// 引入ejs
+const ejs = require('ejs');
+
 // 引入异步处理包
 const asyncBootstrap = require('react-async-bootstrapper').default;
 
@@ -23,7 +29,7 @@ const ReactDomServer = require('react-dom/server');
 // 实时，获取最新的template文件
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
-    axios.get('http://localhost:8888/public/index.html')
+    axios.get('http://localhost:8888/public/server.ejs')
       .then((res) => {
         // axios请求的数据是放在data里面的
         resolve(res.data);
@@ -73,6 +79,7 @@ serverCompiler.watch({}, (err, stats) => {
 const getStoreState = (stores) => {
   return Object.keys(stores).reduce((result, storeName) => {
     result[storeName] = stores[storeName].toJson();
+    return result;
   }, {})
 };
 
@@ -118,8 +125,18 @@ module.exports = function (app) {
         // 打印出来看看
         console.log(stores.appState.count);
 
+        const state = getStoreState(stores);
+
         const content = ReactDomServer.renderToString(app);
-        res.send(template.replace('<!--app-->', content));
+
+        // res.send(template.replace('<!--app-->', content));
+
+        const html = ejs.render(template, {
+          appString: content,
+          initialState: serialize(state)
+        })
+
+        res.send(html);
       })
     })
   })

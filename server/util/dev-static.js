@@ -14,20 +14,7 @@ const MemoryFs = require('memory-fs');
 // 引入http-proxy-middleware
 const proxy = require('http-proxy-middleware');
 
-// 序列化
-const serialize = require('serialize-javascript');
-
-// 引入ejs
-const ejs = require('ejs');
-
-// 引入异步处理包
-const asyncBootstrap = require('react-async-bootstrapper').default;
-
-// 引入react-dom/server
-const ReactDomServer = require('react-dom/server');
-
-// 引入Helmet
-const Helmet = require('react-helmet').default;
+const serverRender = require('./server-render');
 
 // 实时，获取最新的template文件
 const getTemplate = () => {
@@ -68,7 +55,7 @@ const serverCompiler = webpack(serverConfig);
 serverCompiler.outputFileSystem = mfs;
 
 // 全局变量
-let serverBundle, createStoreMap;
+let serverBundle;
 
 serverCompiler.watch({}, (err, stats) => {
   if (err) throw err;
@@ -94,16 +81,8 @@ serverCompiler.watch({}, (err, stats) => {
   // m._compile(bundle, 'server-entry.js');
 
   const m = getModuleFromString(bundle, 'server-entry.js');
-  serverBundle = m.exports.default;
-  createStoreMap = m.exports.createStoreMap;
+  serverBundle = m.exports;
 })
-
-const getStoreState = (stores) => {
-  return Object.keys(stores).reduce((result, storeName) => {
-    result[storeName] = stores[storeName].toJson();
-    return result;
-  }, {})
-};
 
 module.exports = function (app) {
 
@@ -112,61 +91,13 @@ module.exports = function (app) {
     target: 'http://localhost:8888'
   }));
 
-  app.get('*', function (req, res) {
+  app.get('*', function (req, res, next) {
+    // 优化
+    if (!serverBundle) {
+      return res.send('正在编译中...');
+    }
     getTemplate().then((template) => {
-      /**
-       * 这个serverBundle就是server-entry.js 这个文件export default出来的东西，也就是下面这个东西
-       * export default (stores, routerContext, url) => (
-       * <Provider {...stores}>
-       * <StaticRouter context={routerContext} location={url}>
-       * <App />
-       * </StaticRouter>
-       * </Provider>
-       * );
-       */
-
-      const routerContext = {};
-
-      const stores = createStoreMap();
-      const app = serverBundle(stores, routerContext, req.url);
-
-      asyncBootstrap(app).then(() => {
-        // 下面的重定向，必须放在renderToString之后
-        // 如果有路由的 redirect的话，
-        // react-router会自动给 routerContext上面加上一个url的
-        if (routerContext.url) {
-          // 如果有这个属性的话，直接在node端给 redirect掉
-          // 也就是路由重新定向
-          // 302是重定向的意思
-          // 直接让浏览器重定向
-          res.status(302).setHeader('Location', routerContext.url);
-          // 结束这次请求
-          res.end();
-          return;
-        }
-
-        const helmet = Helmet.rewind();
-
-        // 打印出来看看
-        console.log(stores.appState.count);
-
-        const state = getStoreState(stores);
-
-        const content = ReactDomServer.renderToString(app);
-
-        // res.send(template.replace('<!--app-->', content));
-
-        const html = ejs.render(template, {
-          appString: content,
-          initialState: serialize(state),
-          meta: helmet.meta.toString(),
-          title: helmet.title.toString(),
-          style: helmet.style.toString(),
-          link: helmet.link.toString()
-        })
-
-        res.send(html);
-      })
-    })
+      return serverRender(serverBundle, template, req, res);
+    }).catch(next);
   })
 }

@@ -3,7 +3,8 @@ const favicon = require('serve-favicon');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 // react服务端渲染的主要模块
-const ReactSSR = require('react-dom/server');
+// const ReactSSR = require('react-dom/server');
+const serverRender = require('./util/server-render');
 // fs模块
 const fs = require('fs');
 // 绝对路径
@@ -40,23 +41,34 @@ app.use('/api', require('./util/proxy'));
 if (!isDev) {
   // 不是开发环境的时候，这么做
   // 编译出来的server-entry.js
-  const serverEntry = require('../dist/server-entry').default;
+  const serverEntry = require('../dist/server-entry');
   // 同步地读取文件, 同时指定utf8的格式，这样才是string
-  const template = fs.readFileSync(path.join(__dirname, '../dist/index.html'), 'utf8');
+  const template = fs.readFileSync(path.join(__dirname, '../dist/server.ejs'), 'utf8');
   // 专门处理静态文件的，目前，静态文件都是在dist目录下面
   app.use('/public', express.static(path.join(__dirname, '../dist')));
   // 从浏览器端发出来的任何请求，都返回服务端渲染的代码
-  app.get('*', function (req, res) {
-    // 服务端渲染
-    const appString = ReactSSR.renderToString(serverEntry);
-    // 替换，然后返回浏览器
-    res.send(template.replace('<!--app-->', appString));
+  app.get('*', function (req, res, next) {
+    // // 服务端渲染
+    // const appString = ReactSSR.renderToString(serverEntry);
+    // // 替换，然后返回浏览器
+    // res.send(template.replace('<!--app-->', appString));
+
+    serverRender(serverEntry, template, req, res)
+      .catch(next);
+
   });
 } else {
   // 是开发环境的时候，这么做
   const devStatic = require('./util/dev-static');
   devStatic(app);
 }
+
+// 全局的错误处理
+// (error, req, res, next)虽然后面的三个参数，用不到，但是必须传，因为express是根据参数的长度判断是不是errorHandler
+app.use(function (error, req, res, next) {
+  console.log(error);
+  res.status(500).send(error);
+})
 
 // 监听端口
 app.listen(3333, function () {

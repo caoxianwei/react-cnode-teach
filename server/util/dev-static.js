@@ -26,6 +26,9 @@ const asyncBootstrap = require('react-async-bootstrapper').default;
 // 引入react-dom/server
 const ReactDomServer = require('react-dom/server');
 
+// 引入Helmet
+const Helmet = require('react-helmet').default;
+
 // 实时，获取最新的template文件
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
@@ -39,7 +42,23 @@ const getTemplate = () => {
 }
 
 // 构造函数--hack做法
-const Module = module.constructor;
+// const Module = module.constructor;
+
+// node的原生的module模块
+const NativeModule = require('module');
+const vm = require('vm');
+
+const getModuleFromString = (bundle, filename) => {
+  const m = { exports: {} };
+  const wrapper = NativeModule.wrap(bundle);
+  const script = new vm.Script(wrapper, {
+    filename: filename,
+    displayErrors: true,
+  });
+  const result = script.runInThisContext();
+  result.call(m.exports, m.exports, require, m);
+  return m;
+};
 
 // 实例化MemoryFs
 const mfs = new MemoryFs;
@@ -67,11 +86,14 @@ serverCompiler.watch({}, (err, stats) => {
   );
   // 读取文件--是string类型的 注意是utf-8的
   const bundle = mfs.readFileSync(bundlePath, 'utf-8');
+
   // 将上述文件，转化为js可以使用的模块内容--需要借助一种比较hack的方式
   // 实例化一个Module，然后去解析string--再放到一个外部的全局变量中
-  const m = new Module();
+  // const m = new Module();
   // 不要忘记文件名'server-entry.js'
-  m._compile(bundle, 'server-entry.js');
+  // m._compile(bundle, 'server-entry.js');
+
+  const m = getModuleFromString(bundle, 'server-entry.js');
   serverBundle = m.exports.default;
   createStoreMap = m.exports.createStoreMap;
 })
@@ -122,6 +144,9 @@ module.exports = function (app) {
           res.end();
           return;
         }
+
+        const helmet = Helmet.rewind();
+
         // 打印出来看看
         console.log(stores.appState.count);
 
@@ -133,7 +158,11 @@ module.exports = function (app) {
 
         const html = ejs.render(template, {
           appString: content,
-          initialState: serialize(state)
+          initialState: serialize(state),
+          meta: helmet.meta.toString(),
+          title: helmet.title.toString(),
+          style: helmet.style.toString(),
+          link: helmet.link.toString()
         })
 
         res.send(html);

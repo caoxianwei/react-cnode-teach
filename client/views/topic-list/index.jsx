@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
+import Helmet from 'react-helmet';
 import { AppState } from '../../store/app-state';
 
 // 装饰器注入
@@ -36,6 +37,10 @@ export default class TopicList extends Component {
   render() {
     return (
       <div>
+        <Helmet>
+          <title>这是话题列表页面</title>
+          <meta name="description" content="这是话题列表页面的描述，哈哈哈哈" />
+        </Helmet>
         <div>TopicList</div>
         <div>
           <input type="text" onChange={e => this.inputChange(e)} />

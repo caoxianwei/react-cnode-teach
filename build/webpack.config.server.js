@@ -7,6 +7,8 @@ module.exports = webpackMerge(baseConfig, {
   entry: {
     app: path.join(__dirname, '../client/server-entry.js')
   },
+  // externals可以指定，不将什么包，打包在输出的bundle里面
+  externals: Object.keys(require('../package.json').dependencies),
   output: {
     filename: 'server-entry.js',
     // 打包出来的js，所使用的模块加载方案，可以是：umd cmd amd commonjs

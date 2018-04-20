@@ -3,8 +3,21 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+
+// 创建mui的主题
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { lightBlue, pink } from 'material-ui/colors';
+
 import App from './views/App';
 import AppState from './store/app-state';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: lightBlue,
+    accent: pink,
+    type: 'light',
+  },
+})
 
 
 // 先渲染挂载在body上面，因为还没写模板呢
@@ -20,7 +33,9 @@ const render = (Component) => {
     <AppContainer>
       <BrowserRouter>
         <Provider appState={new AppState(initialState.appState)}>
-          <Component />
+          <MuiThemeProvider theme={theme}>
+            <Component />
+          </MuiThemeProvider>
         </Provider>
       </BrowserRouter>
     </AppContainer>,

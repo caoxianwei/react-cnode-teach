@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
+import Button from 'material-ui/Button';
 import { AppState } from '../../store/app-state';
 
 // 装饰器注入
@@ -42,6 +43,7 @@ export default class TopicList extends Component {
           <meta name="description" content="这是话题列表页面的描述，哈哈哈哈" />
         </Helmet>
         <div>TopicList</div>
+        <Button raised color="primary">我是按钮</Button>
         <div>
           <input type="text" onChange={e => this.inputChange(e)} />
           <span>{this.props.appState.msg}</span>

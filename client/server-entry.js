@@ -5,6 +5,12 @@ import { StaticRouter } from 'react-router-dom';
 // 在客户端只用Provider即可
 // 在node端，需要用Provider和useStaticRendering
 import { Provider, useStaticRendering } from 'mobx-react';
+
+// material-ui相关
+import { JssProvider } from 'react-jss';
+
+import { MuiThemeProvider } from 'material-ui/styles';
+
 import App from './views/App';
 
 import { createStoreMap } from './store/store';
@@ -18,10 +24,14 @@ useStaticRendering(true);
 // 且每次用的都是新的store的数据
 // context是进行服务端渲染的时候，传给StaticRouter的一个对象
 // context里面有很多有用的信息，如 URL 等
-export default (stores, routerContext, url) => (
+export default (stores, routerContext, sheetsRegistry, jss, theme, url) => (
   <Provider {...stores}>
     <StaticRouter context={routerContext} location={url}>
-      <App />
+      <JssProvider registry={sheetsRegistry} jss={jss} >
+        <MuiThemeProvider theme={theme}>
+          <App />
+        </MuiThemeProvider>
+      </JssProvider>
     </StaticRouter>
   </Provider>
 );

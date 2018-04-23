@@ -27,23 +27,23 @@ const theme = createMuiTheme({
 
 const initialState = window.__INITIAL_STATE__ || {};// eslint-disable-line
 
-// const createApp = (TheApp) = {
-//   class Main extends React.Component { // eslint-disable-line
-//     // 去掉服务端css
-//     componentDidMount () {
-//       const jssStyles = document.getElementById('jss-server-side');
-//       if (jssStyles && jssStyles.parentNode) {
-//         jssStyles.parentNode.removeChild(jssStyles);
-//       }
-//     }
+const createApp = (TheApp) => {
+  class Main extends React.Component {
+    // 去掉服务端css
+    componentDidMount() {
+      const jssStyles = document.getElementById('jss-server-side');
+      if (jssStyles && jssStyles.parentNode) {
+        jssStyles.parentNode.removeChild(jssStyles);
+      }
+    }
 
-//     render() {
-//       return <TheApp />
-//     }
-//   };
+    render() {
+      return <TheApp />
+    }
+  }
 
-//   return Main;
-// }
+  return Main;
+}
 
 const root = document.getElementById('root');
 const render = (Component) => {
@@ -61,13 +61,13 @@ const render = (Component) => {
   );
 }
 
-render(App);
-// render(createApp(App));
+// render(App);
+render(createApp(App));
 // 需要热更新的代码出现的话
 if (module.hot) {
   module.hot.accept('./views/App', () => {
     const NextApp = require('./views/App').default; // eslint-disable-line
-    render(NextApp);
-    // render(createApp(NextApp));
+    // render(NextApp);
+    render(createApp(NextApp));
   })
 }

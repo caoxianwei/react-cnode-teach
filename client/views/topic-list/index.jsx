@@ -44,10 +44,6 @@ export default class TopicList extends Component {
         </Helmet>
         <div>TopicList</div>
         <Button raised color="primary">我是按钮</Button>
-        <div>
-          <input type="text" onChange={e => this.inputChange(e)} />
-          <span>{this.props.appState.msg}</span>
-        </div>
       </div>
     );
   }

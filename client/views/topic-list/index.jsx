@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 import Button from 'material-ui/Button';
 import { AppState } from '../../store/app-state';
+import Container from '../layout/container';
 
 // 装饰器注入
 // observer意思，就是监控变化，mobx值一变，视图就变化
@@ -37,14 +38,14 @@ export default class TopicList extends Component {
 
   render() {
     return (
-      <div>
+      <Container>
         <Helmet>
           <title>这是话题列表页面</title>
           <meta name="description" content="这是话题列表页面的描述，哈哈哈哈" />
         </Helmet>
         <div>TopicList</div>
         <Button raised color="primary">我是按钮</Button>
-      </div>
+      </Container>
     );
   }
 }

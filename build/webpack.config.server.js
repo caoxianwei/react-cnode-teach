@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const webpackMerge = require('webpack-merge');
 const baseConfig = require('./webpack.base');
 module.exports = webpackMerge(baseConfig, {
@@ -13,5 +14,10 @@ module.exports = webpackMerge(baseConfig, {
     filename: 'server-entry.js',
     // 打包出来的js，所使用的模块加载方案，可以是：umd cmd amd commonjs
     libraryTarget: 'commonjs2'
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.API_BASE': '"http://127.0.0.1:3000"'
+    })
+  ]
 })

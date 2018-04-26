@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
-import Button from 'material-ui/Button';
+import Tabs, { Tab } from 'material-ui/Tabs';
+// import Button from 'material-ui/Button';
 import { AppState } from '../../store/app-state';
 import Container from '../layout/container';
+import TopicListItem from './list-item';
 
 // 装饰器注入
 // observer意思，就是监控变化，mobx值一变，视图就变化
@@ -12,7 +14,9 @@ import Container from '../layout/container';
 export default class TopicList extends Component {
   constructor() {
     super();
-    // do some here
+    this.state = {
+      tabIndex: 0,
+    }
   }
   componentDidMount() {
     // do some here
@@ -32,19 +36,43 @@ export default class TopicList extends Component {
     })
   }
 
-  inputChange(event) {
-    this.props.appState.changeName(event.target.value);
+  tabChange(event, index) {
+    this.setState({
+      tabIndex: index,
+    })
+  }
+
+  listItemClick(e) {
+    // do some
+    console.log(e.target);
   }
 
   render() {
+    // 可以看出来，每次组件的state一改变，就会触发render函数重新执行
+    const { tabIndex } = this.state;
+    const topic = {
+      tab: '关赛鹏',
+      title: '关赛鹏的第一次评论',
+      userName: 'gsp',
+      reply_count: 1000,
+      visit_count: 999,
+      create_at: '2018-04-26',
+    };
     return (
       <Container>
         <Helmet>
-          <title>这是话题列表页面</title>
-          <meta name="description" content="这是话题列表页面的描述，哈哈哈哈" />
+          <title>gsp-cnode话题列表</title>
+          <meta name="description" content="gsp-cnode话题列表" />
         </Helmet>
-        <div>TopicList</div>
-        <Button raised color="primary">我是按钮</Button>
+        <Tabs value={tabIndex} onChange={(e, index) => this.tabChange(e, index)}>
+          <Tab label="全部" />
+          <Tab label="分享" />
+          <Tab label="工作" />
+          <Tab label="问答" />
+          <Tab label="精品" />
+          <Tab label="测试" />
+        </Tabs>
+        <TopicListItem onClick={e => this.listItemClick(e)} topic={topic} />
       </Container>
     );
   }

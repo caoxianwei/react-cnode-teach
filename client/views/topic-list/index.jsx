@@ -3,14 +3,21 @@ import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import List from 'material-ui/List';
+import { CircularProgress } from 'material-ui/Progress';
 // import Button from 'material-ui/Button';
-import { AppState } from '../../store/app-state';
+// import { AppState } from '../../store/app-state';
 import Container from '../layout/container';
 import TopicListItem from './list-item';
 
 // 装饰器注入
 // observer意思，就是监控变化，mobx值一变，视图就变化
-@inject('appState') @observer
+@inject((stores) => {
+  return {
+    appState: stores.appState,
+    topicStore: stores.topicStore,
+  }
+}) @observer
 export default class TopicList extends Component {
   constructor() {
     super();
@@ -19,7 +26,7 @@ export default class TopicList extends Component {
     }
   }
   componentDidMount() {
-    // do some here
+    this.props.topicStore.fetchTopics();
   }
 
   asyncBootstrap() {
@@ -50,14 +57,18 @@ export default class TopicList extends Component {
   render() {
     // 可以看出来，每次组件的state一改变，就会触发render函数重新执行
     const { tabIndex } = this.state;
-    const topic = {
-      tab: '关赛鹏',
-      title: '关赛鹏的第一次评论',
-      userName: 'gsp',
-      reply_count: 1000,
-      visit_count: 999,
-      create_at: '2018-04-26',
-    };
+    const { topicStore } = this.props;
+    const topicList = topicStore.topics;
+    const syncingTopic = topicStore.syncing;
+
+    // const topic = {
+    //   tab: '关赛鹏',
+    //   title: '关赛鹏的第一次评论',
+    //   userName: 'gsp',
+    //   reply_count: 1000,
+    //   visit_count: 999,
+    //   create_at: '2018-04-26',
+    // };
     return (
       <Container>
         <Helmet>
@@ -72,12 +83,25 @@ export default class TopicList extends Component {
           <Tab label="精品" />
           <Tab label="测试" />
         </Tabs>
-        <TopicListItem onClick={e => this.listItemClick(e)} topic={topic} />
+        <List>
+          {
+            topicList.map(topic => <TopicListItem key={topic.id} onClick={e => this.listItemClick(e)} topic={topic} />)
+          }
+        </List>
+        {
+          syncingTopic ? (
+            <div>
+              <CircularProgress color="accent" size={100} />
+            </div>
+          ) : null
+        }
       </Container>
     );
   }
 }
 
-TopicList.propTypes = {
-  appState: PropTypes.instanceOf(AppState),
+// mobx注入的属性都需要加一个wrappedComponent
+TopicList.wrappedComponent.propTypes = {
+  appState: PropTypes.object.isRequired,
+  topicStore: PropTypes.object.isRequired,
 }

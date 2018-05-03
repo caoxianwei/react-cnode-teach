@@ -6,9 +6,11 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import List from 'material-ui/List';
 import { CircularProgress } from 'material-ui/Progress';
 // import Button from 'material-ui/Button';
+import querystring from 'query-string';
 // import { AppState } from '../../store/app-state';
 import Container from '../layout/container';
 import TopicListItem from './list-item';
+import { tabs } from '../../util/variable-define';
 
 // 装饰器注入
 // observer意思，就是监控变化，mobx值一变，视图就变化
@@ -19,14 +21,30 @@ import TopicListItem from './list-item';
   }
 }) @observer
 export default class TopicList extends Component {
+  // react-router从最顶层加入之后，可以在任何组件里面通过这种方式获取
+  static contextTypes = {
+    router: PropTypes.object,
+  }
   constructor() {
     super();
-    this.state = {
-      tabIndex: 0,
+  }
+
+  componentDidMount() {
+    const tab = this.getTab();
+    this.props.topicStore.fetchTopics(tab);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.location.search !== this.props.location.search) {
+      this.props.topicStore.fetchTopics(this.getTab(nextProps.location.search));
     }
   }
-  componentDidMount() {
-    this.props.topicStore.fetchTopics();
+
+  getTab(search) {
+    search = search || this.props.location.search;
+    const query = querystring.parse(search);
+    const tab = query.tab;
+    return tab || 'all';
   }
 
   asyncBootstrap() {
@@ -43,9 +61,10 @@ export default class TopicList extends Component {
     })
   }
 
-  tabChange(event, index) {
-    this.setState({
-      tabIndex: index,
+  tabChange(event, value) {
+    this.context.router.history.push({
+      pathname: '/list',
+      search: `?tab=${value}`,
     })
   }
 
@@ -55,33 +74,23 @@ export default class TopicList extends Component {
   }
 
   render() {
-    // 可以看出来，每次组件的state一改变，就会触发render函数重新执行
-    const { tabIndex } = this.state;
     const { topicStore } = this.props;
     const topicList = topicStore.topics;
     const syncingTopic = topicStore.syncing;
+    const tab = this.getTab();
 
-    // const topic = {
-    //   tab: '关赛鹏',
-    //   title: '关赛鹏的第一次评论',
-    //   userName: 'gsp',
-    //   reply_count: 1000,
-    //   visit_count: 999,
-    //   create_at: '2018-04-26',
-    // };
     return (
       <Container>
         <Helmet>
           <title>gsp-cnode话题列表</title>
           <meta name="description" content="gsp-cnode话题列表" />
         </Helmet>
-        <Tabs value={tabIndex} onChange={(e, index) => this.tabChange(e, index)}>
-          <Tab label="全部" />
-          <Tab label="分享" />
-          <Tab label="工作" />
-          <Tab label="问答" />
-          <Tab label="精品" />
-          <Tab label="测试" />
+        <Tabs value={tab} onChange={(e, value) => this.tabChange(e, value)}>
+          {
+            Object.keys(tabs).map(key => (
+              <Tab key={key} label={tabs[key]} value={key} />
+            ))
+          }
         </Tabs>
         <List>
           {
@@ -90,7 +99,7 @@ export default class TopicList extends Component {
         </List>
         {
           syncingTopic ? (
-            <div>
+            <div style={{ display: 'flex', justifyContent: 'space-around', padding: '40px 0' }}>
               <CircularProgress color="accent" size={100} />
             </div>
           ) : null
@@ -104,4 +113,8 @@ export default class TopicList extends Component {
 TopicList.wrappedComponent.propTypes = {
   appState: PropTypes.object.isRequired,
   topicStore: PropTypes.object.isRequired,
+}
+
+TopicList.propTypes = {
+  location: PropTypes.object.isRequired,
 }

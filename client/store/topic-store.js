@@ -34,13 +34,14 @@ class TopicStore {
     this.topics.push(new Topic(createTopic(topic)));
   }
 
-  @action fetchTopics() {
+  @action fetchTopics(tab) {
     return new Promise((resolve, reject) => {
       this.topics = [];
       this.syncing = true;
       get('topics', {
         // 是否需要将mk字符串渲染成html字符串
         mdrender: false,
+        tab,
       }).then((resp) => {
         if (resp.success) {
           resp.data.forEach((topic) => {

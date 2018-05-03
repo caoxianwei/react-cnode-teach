@@ -4,15 +4,23 @@ import ListItem from 'material-ui/List/ListItem';
 import ListItemAvatar from 'material-ui/List/ListItemAvatar';
 import ListItemText from 'material-ui/List/ListItemText';
 import Avatar from 'material-ui/Avatar';
+import cx from 'classnames';
 import { withStyles } from 'material-ui/styles';
 import { topicPrimaryStyle, topicSecondaryStyle } from './styles';
+import { tabs } from '../../util/variable-define';
 
-const Primary = ({ classes, topic }) => (
-  <div className={classes.root}>
-    <span className={classes.tab}>{topic.tab}</span>
-    <span className={classes.title}>{topic.title}</span>
-  </div>
-)
+const Primary = ({ classes, topic }) => {
+  const classNames = cx({
+    [classes.tab]: true,
+    [classes.top]: topic.top,
+  })
+  return (
+    <div className={classes.root}>
+      <span className={classNames}>{topic.top ? '置顶' : tabs[topic.tab]}</span>
+      <span className={classes.title}>{topic.title}</span>
+    </div>
+  )
+}
 
 const StyledPrimary = withStyles(topicPrimaryStyle)(Primary);
 

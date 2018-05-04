@@ -27,6 +27,7 @@ export default class TopicList extends Component {
   }
   constructor() {
     super();
+    this.listItemClick = this.listItemClick.bind(this);
   }
 
   componentDidMount() {
@@ -68,9 +69,8 @@ export default class TopicList extends Component {
     })
   }
 
-  listItemClick(e) {
-    // do some
-    console.log(e.target);
+  listItemClick(e, topic) {
+    this.context.router.history.push(`/detail/${topic.id}`);
   }
 
   render() {
@@ -94,7 +94,7 @@ export default class TopicList extends Component {
         </Tabs>
         <List>
           {
-            topicList.map(topic => <TopicListItem key={topic.id} onClick={e => this.listItemClick(e)} topic={topic} />)
+            topicList.map(topic => <TopicListItem key={topic.id} onClick={() => this.listItemClick(event, topic)} topic={topic} />)
           }
         </List>
         {

@@ -76,19 +76,16 @@ export const topicDetailStyle = (theme) => {
 
 export const replyStyle = {
   root: {
-    display: 'flex',
-    alignItems: 'flex-start',
     padding: 20,
     paddingBottom: 0,
     borderBottom: '1px solid #dfdfdf',
   },
   left: {
+    float: 'left',
+    width: 40,
     marginRight: 20,
   },
   right: {
-    '& img': {
-      maxWidth: '100%',
-      display: 'block',
-    },
+    overflow: 'hidden',
   },
 }

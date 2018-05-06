@@ -60,7 +60,7 @@ class TopicDetail extends Component {
         </Container>
 
         <Paper elevation={4} className={classes.replies}>
-          <header classes={classes.replyHeader}>
+          <header className={classes.replyHeader}>
             <span>{`${topic.reply_count} 回复`}</span>
             <span>{`最新回复 ${topic.last_reply_at} `}</span>
           </header>
@@ -84,7 +84,7 @@ TopicDetail.wrappedComponent.propTypes = {
   topicStore: PropTypes.instanceOf(TopicStore).isRequired,
 }
 
-TopicStore.propTypes = {
+TopicDetail.propTypes = {
   match: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
 }

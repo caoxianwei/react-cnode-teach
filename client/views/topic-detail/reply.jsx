@@ -1,12 +1,12 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import marked from 'marked';
 import Avatar from 'material-ui/Avatar';
 import { withStyles } from 'material-ui/styles';
-import { replyStyles } from './styles';
+import { replyStyle } from './styles';
 import formatDate from '../../util/date-format';
 
-const Reply = ((reply, classes) => {
+const Reply = ({ reply, classes }) => {
   return (
     <div className={classes.root}>
       <div className={classes.left}>
@@ -18,11 +18,11 @@ const Reply = ((reply, classes) => {
       </div>
     </div>
   )
-})
+}
 
-// Reply.propTypes = {
-//   // reply: PropTypes.object.isRequired,
-//   // classes: PropTypes.object.isRequired,
-// }
+Reply.propTypes = {
+  reply: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
+}
 
-export default withStyles(replyStyles)(Reply)
+export default withStyles(replyStyle)(Reply)

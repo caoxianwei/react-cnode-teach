@@ -6,6 +6,9 @@ import { observer, inject } from 'mobx-react';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import { CircularProgress } from 'material-ui/Progress';
+import Button from 'material-ui/Button';
+import IconReply from 'material-ui-icons/Reply';
+import SimpleMDE from 'react-simplemde-editor';
 import Container from '../layout/container';
 import { topicDetailStyle } from './styles';
 import TopicStore from '../../store/topic-store';
@@ -15,26 +18,48 @@ import Reply from './reply';
   return {
     topicStore: stores.topicStore,
     appState: stores.appState,
+    user: stores.appState.user,
   }
 }) @observer
 class TopicDetail extends Component {
-  // static contextTypes = {
-  //   router: PropTypes.object,
-  // }
+  static contextTypes = {
+    router: PropTypes.object,
+  }
 
-  // constructor() {
-  //   super();
-  // }
+  constructor() {
+    super();
+    this.state = {
+      newReply: '',
+    }
+    this.handleNewReplyChange = this.handleNewReplyChange.bind(this);
+    this.login = this.login.bind(this);
+    this.doReply = this.doReply.bind(this);
+  }
 
   componentDidMount() {
     const id = this.props.match.params.id;
     this.props.topicStore.getTopicDetail(id);
   }
 
+  handleNewReplyChange(value) {
+    this.setState({
+      newReply: value,
+    })
+  }
+
+  login() {
+    this.context.router.history.push('/user/login');
+  }
+
+  doReply() {
+
+  }
+
   render() {
     const { classes } = this.props;
     const id = this.props.match.params.id;
     const topic = this.props.topicStore.detailMap[id];
+    const { user } = this.props;
     if (!topic) {
       return (
         <Container>
@@ -64,6 +89,33 @@ class TopicDetail extends Component {
             <span>{`${topic.reply_count} 回复`}</span>
             <span>{`最新回复 ${topic.last_reply_at} `}</span>
           </header>
+          {
+            user.isLogin ?
+              <section className={classes.replyEditor}>
+                <SimpleMDE
+                  onChange={this.handleNewReplyChange}
+                  value={this.state.newReply}
+                  options={{
+                    toolbar: false,
+                    autoFocus: false,
+                    spellChecker: false,
+                    placeholder: '请添加您的精彩回复',
+                  }}
+                />
+                <Button fab color="primary" onClick={this.doReply} className={classes.replyButton}>
+                  <IconReply />
+                </Button>
+              </section> : null
+          }
+          {
+            !user.isLogin ?
+              <section className={classes.notLoginButton}>
+                <Button raised color="accent" onClick={this.login}>
+                  请登录后进行回复
+                </Button>
+              </section>
+              : null
+          }
           <section>
             {
               topic.replies.map((reply) => {
@@ -82,6 +134,7 @@ class TopicDetail extends Component {
 TopicDetail.wrappedComponent.propTypes = {
   // appState: PropTypes.object.isRequired,
   topicStore: PropTypes.instanceOf(TopicStore).isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 TopicDetail.propTypes = {

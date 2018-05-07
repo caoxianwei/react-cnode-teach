@@ -1,10 +1,14 @@
 import { observable, action, extendObservable, computed } from 'mobx';
-import { topicSchema } from '../util/variable-define';
-import { get } from '../util/http';
+import { topicSchema, replySchema } from '../util/variable-define';
+import { get, post } from '../util/http';
 
 // 让topic数据包含所有的字段
 const createTopic = (topic) => {
   return Object.assign({}, topicSchema, topic);
+}
+
+const createReply = (reply) => {
+  return Object.assign({}, replySchema, reply);
 }
 
 // 再创建一个topic的类，让后面的类更加灵活
@@ -17,6 +21,28 @@ class Topic {
   }
 
   @observable syncing = false;
+  @observable createdReplies = [];
+  @action doReply(content) {
+    return new Promise((resolve, reject) => {
+      post(`topic/${this.id}/replies`, {
+        needAccessToken: true,
+      }, { content })
+        .then((resp) => {
+          if (resp.success) {
+            this.createdReplies.push(createReply({
+              id: resp.data.reply_id,
+              content,
+              create_at: Date.now(),
+            }));
+            resolve();
+          } else {
+            reject(resp);
+          }
+        }).catch((err) => {
+          reject(err);
+        })
+    })
+  }
 }
 
 class TopicStore {

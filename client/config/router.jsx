@@ -1,10 +1,10 @@
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-// import { inject, observer } from 'mobx-react';
+import { Route, Redirect, withRouter } from 'react-router-dom';
+import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import TopicList from '../views/topic-list/index';
 import TopicDetail from '../views/topic-detail/index';
-// import UserInfo from '../views/user/info';
+import UserInfo from '../views/user/info';
 import UserLogin from '../views/user/login';
 
 const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
@@ -27,11 +27,11 @@ const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
   )
 }
 
-// const InjectedPrivateRoute = withRouter(inject(({ appState }) => {
-//   return {
-//     isLogin: appState.user.isLogin,
-//   }
-// })(observer(PrivateRoute)))
+const InjectedPrivateRoute = withRouter(inject(({ appState }) => {
+  return {
+    isLogin: appState.user.isLogin,
+  }
+})(observer(PrivateRoute)))
 
 PrivateRoute.propTypes = {
   component: PropTypes.element.isRequired,
@@ -49,5 +49,5 @@ export default () => [
   <Route path="/list" component={TopicList} key="list" />,
   <Route path="/detail/:id" component={TopicDetail} key="detail" />,
   <Route path="/user/login" exact key="user-login" component={UserLogin} />,
-  // <InjectedPrivateRoute path="/user/info" component={userInfo} key="user-info" />,
+  <InjectedPrivateRoute path="/user/info" component={UserInfo} key="user-info" />,
 ]

@@ -95,19 +95,19 @@ export default class TopicList extends Component {
           }
         </Tabs>
         {
-          createdTopics && createdTopics.length &&
-          <List style={{ backgroundColor: '#dfdfdf' }}>
-            {
-              createdTopics.map((topic) => {
-                topic = Object.assign({}, topic, {
-                  author: user.info,
-                });
-                return (
-                  <TopicListItem key={topic.id} onClick={() => this.listItemClick(event, topic)} topic={topic} />
-                )
-              })
-            }
-          </List>
+          (createdTopics && createdTopics.length) ?
+            <List style={{ backgroundColor: '#dfdfdf' }}>
+              {
+                createdTopics.map((topic) => {
+                  topic = Object.assign({}, topic, {
+                    author: user.info,
+                  });
+                  return (
+                    <TopicListItem key={topic.id} onClick={() => this.listItemClick(event, topic)} topic={topic} />
+                  )
+                })
+              }
+            </List> : null
         }
         <List>
           {

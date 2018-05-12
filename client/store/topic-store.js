@@ -82,9 +82,13 @@ class TopicStore {
         tab,
       }).then((resp) => {
         if (resp.success) {
-          resp.data.forEach((topic) => {
-            this.addTopic(topic);
-          });
+          // resp.data.forEach((topic) => {
+          //   this.addTopic(topic);
+          // });
+          // 一次性赋值，然后渲染页面，不要一个个赋值
+          this.topics = resp.data.map((topic) => {
+            return new Topic(createTopic(topic));
+          })
           resolve();
         } else {
           reject();

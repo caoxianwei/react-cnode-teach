@@ -44,10 +44,6 @@ class UserInfo extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.user.isLogin) {
-      this.context.router.history.replace('/user/login');
-      return;
-    }
     this.props.appState.getUserDetail();
     this.props.appState.getUserCollection();
   }

@@ -4,7 +4,8 @@ import { inject, observer } from 'mobx-react';
 import TextField from 'material-ui/TextField';
 import Button from 'material-ui/Button';
 import { withStyles } from 'material-ui/styles';
-
+import { Redirect } from 'react-router-dom';
+import queryString from 'query-string';
 import UserWrapper from './user';
 import loginStyles from './styles/login-style';
 
@@ -30,11 +31,18 @@ class UserLogin extends Component {
     this.handleLogin = this.handleLogin.bind(this);
   }
 
-  componentDidMount() {
-    if (this.props.user.isLogin) {
-      // 如果已经登录了，我们不希望用户跳到新的页面之后，再重新又跳过去，从而陷入无限地循环中
-      this.context.router.history.replace('/user/info');
-    }
+  // componentWillMount() {
+  //   if (this.props.user.isLogin) {
+  //     // 如果已经登录了，我们不希望用户跳到新的页面之后，再重新又跳过去，从而陷入无限地循环中
+  //     this.context.router.history.replace('/user/info');
+  //   }
+  // }
+
+  getFrom(location) {
+    location = location || this.props.location;
+    console.log(this.props);
+    const query = queryString.parse(location.search);
+    return query.from || '/user/info';
   }
 
   handleInput(event) {
@@ -55,9 +63,9 @@ class UserLogin extends Component {
     })
 
     this.props.appState.login(this.state.accesstoken)
-      .then(() => {
-        this.context.router.history.replace('/user/info');
-      })
+      // .then(() => {
+      //   this.context.router.history.replace('/user/info');
+      // })
       .catch((err) => {
         console.log(err) // eslint-disable-line
       })
@@ -65,6 +73,14 @@ class UserLogin extends Component {
 
   render() {
     const { classes } = this.props;
+    const from = this.getFrom();
+    const { isLogin } = this.props.user;
+    if (isLogin) {
+      return (
+        <Redirect to={from} />
+      )
+    }
+
     return (
       <UserWrapper>
         <div className={classes.root}>
@@ -94,6 +110,7 @@ class UserLogin extends Component {
 UserLogin.wrappedComponent.propTypes = {
   appState: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
 }
 
 UserLogin.propTypes = {

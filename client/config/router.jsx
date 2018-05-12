@@ -28,9 +28,9 @@ const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
   )
 }
 
-const InjectedPrivateRoute = withRouter(inject(({ appState }) => {
+const InjectedPrivateRoute = withRouter(inject((stores) => {
   return {
-    isLogin: appState.user.isLogin,
+    isLogin: stores.appState.user.isLogin,
   }
 })(observer(PrivateRoute)))
 

@@ -6,6 +6,7 @@ import TopicList from '../views/topic-list/index';
 import TopicDetail from '../views/topic-detail/index';
 import UserInfo from '../views/user/info';
 import UserLogin from '../views/user/login';
+import TopicCreate from '../views/topic-create/index';
 
 const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
   return (
@@ -50,4 +51,5 @@ export default () => [
   <Route path="/detail/:id" component={TopicDetail} key="detail" />,
   <Route path="/user/login" exact key="user-login" component={UserLogin} />,
   <InjectedPrivateRoute path="/user/info" component={UserInfo} key="user-info" />,
+  <InjectedPrivateRoute path="/user/create" component={TopicCreate} key="create" />,
 ]

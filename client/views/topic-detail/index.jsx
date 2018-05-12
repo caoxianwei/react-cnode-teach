@@ -52,7 +52,17 @@ class TopicDetail extends Component {
   }
 
   doReply() {
-
+    const id = this.props.match.params.id;
+    const topic = this.props.topicStore.detailMap[id];
+    topic.doReply(this.state.newReply)
+      .then(() => {
+        this.setState({
+          newReply: '',
+        })
+      })
+      .catch((err) => {
+        console.log(err); // eslint-disable-line
+      })
   }
 
   render() {
@@ -83,6 +93,32 @@ class TopicDetail extends Component {
             <p dangerouslySetInnerHTML={{ __html: marked(topic.content) }} />
           </section>
         </Container>
+
+        {
+          topic.createdReplies && topic.createdReplies.length > 0 ?
+            (
+              <Paper elevation={4} className={classes.replies}>
+                <header className={classes.replyHeader}>
+                  <span>我的最新回复</span>
+                  <span>{`${topic.createdReplies.length}条`}</span>
+                </header>
+                {
+                  topic.createdReplies.map(reply => (
+                    <Reply
+                      key={reply.id}
+                      reply={Object.assign({}, reply, {
+                        author: {
+                          avatar_url: user.info.avatar_url,
+                          loginname: user.info.loginname,
+                        },
+                      },
+                      )}
+                    />
+                  ))
+                }
+              </Paper>
+            ) : null
+        }
 
         <Paper elevation={4} className={classes.replies}>
           <header className={classes.replyHeader}>

@@ -26,11 +26,18 @@ const getStoreState = (stores) => {
 
 module.exports = (bundle, template, req, res) => {
   return new Promise((resolve, reject) => {
+    const user = req.session.user;
+
     const createStoreMap = bundle.createStoreMap;
     const createApp = bundle.default;
 
     const routerContext = {};
     const stores = createStoreMap();
+
+    if (user) {
+      stores.appState.user.isLogin = true;
+      stores.appState.user.info = user;
+    }
 
     // material-ui相关
     const sheetsRegistry = new SheetsRegistry();

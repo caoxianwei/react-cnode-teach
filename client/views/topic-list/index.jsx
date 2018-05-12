@@ -53,13 +53,22 @@ export default class TopicList extends Component {
     // 在我们的node端里面的dev-static.js里面，去调用这个方法的话，就会执行这个方法里面的东西
     // 等这个执行完了之后，才会继续去执行服务端渲染的工作
     // 所以这个方法很强大，可做很多事情，如，数据初始化等
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        this.props.appState.count = 3;
-        // asyncBootstrap这个东西，会根据我们resolve（true还是false）来判断我们这个方法是否执行成功
-        resolve(true);
-      }, 1000)
-    })
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     this.props.appState.count = 3;
+    //     // asyncBootstrap这个东西，会根据我们resolve（true还是false）来判断我们这个方法是否执行成功
+    //     resolve(true);
+    //   }, 1000)
+    // })
+    const query = querystring.parse(this.props.location.search);
+    const tab = query.tab;
+    return this.props.topicStore.fetchTopics(tab || 'all')
+      .then(() => {
+        return true;
+      })
+      .catch(() => {
+        return false;
+      })
   }
 
   tabChange(event, value) {

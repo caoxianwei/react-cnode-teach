@@ -1,4 +1,4 @@
-import { observable, action, extendObservable, computed } from 'mobx';
+import { observable, action, extendObservable, computed, toJS } from 'mobx';
 import { topicSchema, replySchema } from '../util/variable-define';
 import { get, post } from '../util/http';
 
@@ -50,8 +50,9 @@ class TopicStore {
   @observable details;
   @observable syncing;
   @observable createdTopics = [];
+  @observable tab = undefined;
 
-  constructor({ syncing = false, topics = [], details = [] } = {}) {
+  constructor({ syncing = false, topics = [], tab = null, details = [] } = {}) {
     this.syncing = syncing;
     this.topics = topics.map((topic) => {
       return new Topic(createTopic(topic));
@@ -59,6 +60,7 @@ class TopicStore {
     this.details = details.map((detail) => {
       return new Topic(createTopic(detail));
     })
+    this.tab = tab;
   }
 
   addTopic(topic) {
@@ -74,30 +76,35 @@ class TopicStore {
 
   @action fetchTopics(tab) {
     return new Promise((resolve, reject) => {
-      this.topics = [];
-      this.syncing = true;
-      get('topics', {
-        // 是否需要将mk字符串渲染成html字符串
-        mdrender: false,
-        tab,
-      }).then((resp) => {
-        if (resp.success) {
-          // resp.data.forEach((topic) => {
-          //   this.addTopic(topic);
-          // });
-          // 一次性赋值，然后渲染页面，不要一个个赋值
-          this.topics = resp.data.map((topic) => {
-            return new Topic(createTopic(topic));
-          })
-          resolve();
-        } else {
-          reject();
-        }
-        this.syncing = false;
-      }).catch((err) => {
-        reject(err);
-        this.syncing = false;
-      })
+      if (tab === this.tab && this.topics.length > 0) {
+        resolve();
+      } else {
+        this.tab = tab;
+        this.topics = [];
+        this.syncing = true;
+        get('topics', {
+          // 是否需要将mk字符串渲染成html字符串
+          mdrender: false,
+          tab,
+        }).then((resp) => {
+          if (resp.success) {
+            // resp.data.forEach((topic) => {
+            //   this.addTopic(topic);
+            // });
+            // 一次性赋值，然后渲染页面，不要一个个赋值
+            this.topics = resp.data.map((topic) => {
+              return new Topic(createTopic(topic));
+            })
+            resolve();
+          } else {
+            reject();
+          }
+          this.syncing = false;
+        }).catch((err) => {
+          reject(err);
+          this.syncing = false;
+        })
+      }
     })
   }
 
@@ -143,6 +150,16 @@ class TopicStore {
         })
         .catch(reject)
     })
+  }
+
+  toJson() {
+    return {
+      topics: toJS(this.topics),
+      // 布尔值，所以不需要转换了
+      syncing: this.syncing,
+      details: toJS(this.details),
+      tab: this.tab,
+    }
   }
 }
 

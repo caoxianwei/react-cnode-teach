@@ -28,7 +28,7 @@ export default (stores, routerContext, sheetsRegistry, jss, theme, url) => (
   <Provider {...stores}>
     <StaticRouter context={routerContext} location={url}>
       <JssProvider registry={sheetsRegistry} jss={jss} >
-        <MuiThemeProvider theme={theme}>
+        <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
           <App />
         </MuiThemeProvider>
       </JssProvider>

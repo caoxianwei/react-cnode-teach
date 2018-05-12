@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, toJS } from 'mobx';
 import { post, get } from '../util/http';
 
 export default class AppState {
@@ -14,6 +14,12 @@ export default class AppState {
       syncing: false,
       list: [],
     },
+  }
+
+  init(state) {
+    if (state && state.user) {
+      this.user = state.user;
+    }
   }
 
   @action login(accessToken) {
@@ -71,6 +77,12 @@ export default class AppState {
           reject(err);
         })
     })
+  }
+
+  toJson() {
+    return {
+      user: toJS(this.user),
+    }
   }
 }
 
